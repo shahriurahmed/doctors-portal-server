@@ -20,11 +20,33 @@ async function run() {
         const bookingCollection = client.db('doctors_portal').collection('bookings');
 
 
+        app.get('/available', async (req, res) => {
+            const date = req.query.date;
+            //for all service
+            const services = await serviceCollection.find().toArray();
+
+            //get booking of that day
+            const query = { date: date };
+            const bookings = await bookingCollection.find(query).toArray();
+
+            //for each service find booking for that service
+            services.forEach(service => {
+                const serviceBookings = bookings.filter(book => book.treatmentName === service.name);
+                const booked = serviceBookings.map(book => book.slot);
+                const available = service.slots.filter(slot => !booked.includes(slot));
+                service.slots = available;
+            })
+
+            res.send(services);
+        })
+
+
 
         app.get('/service', async (req, res) => {
             const query = {};
             const cursor = serviceCollection.find(query);
             const services = await cursor.toArray();
+
             res.send(services);
         });
 
