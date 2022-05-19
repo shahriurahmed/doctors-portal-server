@@ -8,6 +8,9 @@ const cors = require('cors');
 app.use(cors());
 app.use(express.json());
 
+// DB_USER=doctor_admin
+// DB_PASS=mN7CcWgwnfx3K7qn
+
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.8ap4p.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 
@@ -18,6 +21,22 @@ async function run() {
         await client.connect();
         const serviceCollection = client.db('doctors_portal').collection('services');
         const bookingCollection = client.db('doctors_portal').collection('bookings');
+        const userCollection = client.db('doctors_portal').collection('users');
+
+
+        app.put('/user/:email', async (req, res) => {
+            const email = req.params.email;
+            const filter = { email: email };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: {
+                    plot: `A hervest of random number, such as: ${Math.random()}`
+                },
+            };
+            const result = await userCollection.updateOne(filter, updateDoc, options);
+            res.send(result);
+
+        })
 
 
         app.get('/available', async (req, res) => {
@@ -50,12 +69,13 @@ async function run() {
             res.send(services);
         });
 
-        app.get('/booking', async (req, res) => {
+        app.get('/booking1', async (req, res) => {
             const patient = req.query.patient;
             const query = { patient: patient };
             const bookings = await bookingCollection.find(query).toArray();
+            console.log(bookings);
             res.send(bookings);
-        })
+        });
 
         app.post('/booking', async (req, res) => {
             const booking = req.body;
