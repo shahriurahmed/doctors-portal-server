@@ -8,8 +8,7 @@ const cors = require('cors');
 app.use(cors());
 app.use(express.json());
 
-// DB_USER=doctor_admin
-// DB_PASS=mN7CcWgwnfx3K7qn
+
 
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.8ap4p.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
